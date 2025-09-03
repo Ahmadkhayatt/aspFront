@@ -1,4 +1,4 @@
-// src/App.js
+// task-management-frontend/src/App.js
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import AuthProvider from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -8,6 +8,7 @@ import ResetPassword from "./pages/ResetPassword";
 import Dashboard from "./pages/Dashboard";
 import AdminPanel from "./pages/AdminPanel";
 import EmployeeTasks from "./pages/EmployeeTasks";
+import AdminUsers from "./pages/AdminUsers";
 
 export default function App() {
   return (
@@ -30,6 +31,14 @@ export default function App() {
             element={
               <ProtectedRoute roles={["Admin"]}>
                 <AdminPanel />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin-users"
+            element={
+              <ProtectedRoute roles={["Admin"]}>
+                <AdminUsers />
               </ProtectedRoute>
             }
           />

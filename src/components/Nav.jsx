@@ -1,3 +1,4 @@
+// task-management-frontend/src/components/Nav.jsx
 import { useContext } from "react";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
@@ -7,22 +8,27 @@ export default function Nav() {
 
   return (
     <div className="nav">
-      <Link to="/">تسجيل الدخول</Link>
-      <Link to="/dashboard">لوحة التحكم</Link>
-      {user?.role === "Admin" && <Link to="/admin">لوحة المدير</Link>}
-      {user?.role === "Employee" && <Link to="/my-tasks">مهامي</Link>}
-      <Link to="/reset-password">إعادة كلمة السر</Link>
+      <Link to="/">Login</Link>
+      <Link to="/dashboard">Dashboard</Link>
+      {user?.role === "Admin" && (
+        <>
+          <Link to="/admin">Tasks</Link>
+          <Link to="/admin-users">Users</Link>
+        </>
+      )}
+      {user?.role === "Employee" && <Link to="/my-tasks">My Tasks</Link>}
+      <Link to="/reset-password">Reset Password</Link>
       <div className="spacer" />
       {user ? (
         <div className="row">
           <span className="badge blue">{user.email}</span>
           <span className="badge yellow">{user.role}</span>
           <button className="btn secondary" onClick={logout}>
-            خروج
+            Logout
           </button>
         </div>
       ) : (
-        <span className="hint">غير مسجل</span>
+        <span className="hint">Guest</span>
       )}
     </div>
   );
