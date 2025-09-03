@@ -1,49 +1,74 @@
-// src/pages/Dashboard.jsx
 import { useContext, useEffect, useState } from "react";
 import http from "../api/http";
 import { AuthContext } from "../context/AuthContext";
 
 export default function Dashboard() {
-  const { user, logout } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
   const [tasks, setTasks] = useState([]);
   const [err, setErr] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let on = true;
     const load = async () => {
+      setLoading(true);
+      setErr("");
       try {
         const url = user?.role === "Admin" ? "/tasks" : "/tasks/my";
         const res = await http.get(url);
-        if (on) setTasks(res.data);
+        setTasks(res.data);
       } catch {
-        if (on) setErr("تعذر تحميل المهام");
+        setErr("تعذر تحميل المهام");
+      } finally {
+        setLoading(false);
       }
     };
     load();
-    return () => {
-      on = false;
-    };
   }, [user]);
 
   return (
-    <div style={{ padding: 24, fontFamily: "sans-serif" }}>
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
-        <h2>لوحة التحكم</h2>
-        <div>
-          <span style={{ marginRight: 12 }}>
-            {user?.email} — {user?.role}
-          </span>
-          <button onClick={logout}>تسجيل الخروج</button>
-        </div>
+    <div className="container">
+      <div className="panel" style={{ padding: 20 }}>
+        <h2 style={{ marginTop: 0 }}>لوحة التحكم</h2>
+        <p className="hint">
+          مرحبًا {user?.email} — الدور: <b>{user?.role}</b>
+        </p>
+        {err && <div className="error">{err}</div>}
+        {loading ? (
+          <div className="hint">جارٍ التحميل…</div>
+        ) : (
+          <div className="grid2">
+            {tasks.map((t) => (
+              <div className="card" key={t.id}>
+                <div
+                  className="row"
+                  style={{ justifyContent: "space-between" }}
+                >
+                  <h3 style={{ margin: "4px 0" }}>{t.title}</h3>
+                  <span
+                    className={`badge ${
+                      t.status === "Done"
+                        ? "green"
+                        : t.status === "InProgress"
+                        ? "yellow"
+                        : "blue"
+                    }`}
+                  >
+                    {t.status}
+                  </span>
+                </div>
+                <p className="hint" style={{ marginTop: 8 }}>
+                  {t.description}
+                </p>
+                <div className="row" style={{ marginTop: 10 }}>
+                  <span className="kbd">ID {t.id}</span>
+                  <span className="kbd">User {t.assignedToUserId}</span>
+                </div>
+              </div>
+            ))}
+            {tasks.length === 0 && <div className="hint">لا توجد مهام</div>}
+          </div>
+        )}
       </div>
-      {err && <div style={{ color: "red" }}>{err}</div>}
-      <ul>
-        {tasks.map((t) => (
-          <li key={t.id}>
-            <b>{t.title}</b> — {t.status}
-          </li>
-        ))}
-      </ul>
     </div>
   );
 }
